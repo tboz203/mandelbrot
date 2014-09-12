@@ -21,25 +21,30 @@ FMTSTR = '%.' + str(SIZE) + 'Rg'
 
 def process(ranges, gran, maxiter, scale): # {{{
     x0, y0, xf, yf = ranges
+    cdef vector[mpfr_t] x_range, y_range
     # step = min((xf - x0) / gran, (yf - y0) / gran)
     # data = np.zeros((
 
     x_range = granulated_range(x0, xf, gran)
     y_range = granulated_range(y0, yf, gran)
 
+    i, j = 0, 0
     for y in x_range:
         for x in y_range:
-            data[y, x] = iterations_to_escape(x, y, maxiter)
+            data[i, j] = iterations_to_escape(x, y, maxiter)
+            j += 1
+        i += 1
 
     return data
 # }}}
 
-cdef granulated_range(start, stop, granularity): # {{{
-    out = []
+cdef vector[mpfr_t] granulated_range(start, stop, granularity): # {{{
+    cdef vector[mpfr_t] out
     item = start
+    step = (stop - start) / granularity
 
     while item < stop:
-        out += [from_decimal(item)]
+        out.push_back(from_decimal(item))
         item += step
 
     return out
@@ -71,8 +76,12 @@ cdef long iterations_to_escape(mpfr_t x, mpfr_t y, long maxiter): # {{{
     return i
 # }}}
 
+cdef bint abs_lt_2(mpc_t n): # {{{
+    return False
+# }}}
+
 cdef mpfr_t from_decimal(dec): # {{{
-    cdef mpfr_t out
+    cdef mpfr_t out = NULL
     mpfr_init2(out, SIZE)
     decstr = str(dec)
     mpfr_set_str(out, decstr, 16, MPFR_RNDZ)

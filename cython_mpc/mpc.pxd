@@ -1,10 +1,30 @@
-from gmp cimport *
-from mpfr cimport *
 from libc.stdio cimport *
+from gmp.all cimport *
+from mpfr cimport *
 
 cdef extern from "mpc.h":
     ctypedef struct __mpc_struct:
         pass
+
+    int MPC_RNDNN
+    int MPC_RNDNU
+    int MPC_RNDND
+    int MPC_RNDNZ
+
+    int MPC_RNDUN
+    int MPC_RNDUU
+    int MPC_RNDUD
+    int MPC_RNDUZ
+
+    int MPC_RNDDN
+    int MPC_RNDDU
+    int MPC_RNDDD
+    int MPC_RNDDZ
+
+    int MPC_RNDZN
+    int MPC_RNDZU
+    int MPC_RNDZD
+    int MPC_RNDZZ
 
     ctypedef __mpc_struct mpc_t[1]
     ctypedef __mpc_struct *mpc_ptr
@@ -92,11 +112,11 @@ cdef extern from "mpc.h":
     int  mpc_atanh     (mpc_ptr, mpc_srcptr, mpc_rnd_t)
     void mpc_clear     (mpc_ptr)
     int  mpc_urandom   (mpc_ptr, gmp_randstate_t)
-    void mpc_init2     (mpc_ptr, mpfr_prec_t)
-    void mpc_init3     (mpc_ptr, mpfr_prec_t, mpfr_prec_t)
-    mpfr_prec_t mpc_get_prec (mpc_srcptr x)
-    void mpc_get_prec2 (mpfr_prec_t *pr, mpfr_prec_t *pi, mpc_srcptr x)
-    void mpc_set_prec  (mpc_ptr, mpfr_prec_t)
+    void mpc_init2     (mpc_ptr, mp_prec_t)
+    void mpc_init3     (mpc_ptr, mp_prec_t, mp_prec_t)
+    mp_prec_t mpc_get_prec (mpc_srcptr x)
+    void mpc_get_prec2 (mp_prec_t *pr, mp_prec_t *pi, mpc_srcptr x)
+    void mpc_set_prec  (mpc_ptr, mp_prec_t)
     const char * mpc_get_version ()
 
     int  mpc_strtoc    (mpc_ptr, const char *, char **, int, mpc_rnd_t)
