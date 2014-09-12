@@ -8,61 +8,7 @@ from libcpp.vector cimport vector
 from libcpp.string cimport string
 from libc.stdlib cimport malloc, free
 
-cdef extern from "stdio.h":
-    ctypedef struct FILE
-
-cdef extern from "gmp.h":# {{{
-    ctypedef unsigned long int mp_bitcnt_t
-
-    ctypedef struct __mpz_struct:
-        pass
-    ctypedef struct __mpq_struct:
-        pass
-
-    ctypedef __mpz_struct mpz_t[1]
-    ctypedef __mpz_struct *mpz_ptr
-    ctypedef const __mpz_struct *mpz_srcptr
-
-    ctypedef __mpq_struct mpq_t[1]
-    ctypedef __mpq_struct *mpq_ptr
-    ctypedef const __mpq_struct *mpq_srcptr
-
-
-    void mpq_abs (mpq_ptr, mpq_srcptr)
-    void mpq_add (mpq_ptr, mpq_srcptr, mpq_srcptr)
-    void mpq_canonicalize (mpq_ptr)
-    void mpq_clear (mpq_ptr)
-    void mpq_clears (mpq_ptr, ...)
-    int mpq_cmp (mpq_srcptr, mpq_srcptr)
-    int mpq_cmp_si (mpq_srcptr, long, unsigned long)
-    int mpq_cmp_ui (mpq_srcptr, unsigned long int, unsigned long int)
-    void mpq_div (mpq_ptr, mpq_srcptr, mpq_srcptr)
-    void mpq_div_2exp (mpq_ptr, mpq_srcptr, mp_bitcnt_t)
-    int mpq_equal (mpq_srcptr, mpq_srcptr)
-    void mpq_get_num (mpz_ptr, mpq_srcptr)
-    void mpq_get_den (mpz_ptr, mpq_srcptr)
-    double mpq_get_d (mpq_srcptr)
-    char *mpq_get_str (char *, int, mpq_srcptr)
-    void mpq_init (mpq_ptr)
-    void mpq_inits (mpq_ptr, ...)
-    size_t mpq_inp_str (mpq_ptr, FILE *, int)
-    void mpq_inv (mpq_ptr, mpq_srcptr)
-    void mpq_mul (mpq_ptr, mpq_srcptr, mpq_srcptr)
-    void mpq_mul_2exp (mpq_ptr, mpq_srcptr, mp_bitcnt_t)
-    void mpq_neg (mpq_ptr, mpq_srcptr)
-    size_t mpq_out_str (FILE *, int, mpq_srcptr)
-    void mpq_set (mpq_ptr, mpq_srcptr)
-    void mpq_set_d (mpq_ptr, double)
-    void mpq_set_den (mpq_ptr, mpz_srcptr)
-    void mpq_set_f (mpq_ptr, mpf_srcptr)
-    void mpq_set_num (mpq_ptr, mpz_srcptr)
-    void mpq_set_si (mpq_ptr, signed long int, unsigned long int)
-    int mpq_set_str (mpq_ptr, const char *, int)
-    void mpq_set_ui (mpq_ptr, unsigned long int, unsigned long int)
-    void mpq_set_z (mpq_ptr, mpz_srcptr)
-    void mpq_sub (mpq_ptr, mpq_srcptr, mpq_srcptr)
-    void mpq_swap (mpq_ptr, mpq_ptr)
-    # }}}
+from gmp cimport *
 
 def process(x0=-2, y0=-2, dist=4, granularity=1000, maxiter=70):
     # when they come in, x0, y0, and dist are all most likely to be our
@@ -188,6 +134,26 @@ cdef object from_mpq(mpq_t frac): # {{{
 # --------------- complex rational type helper functions ---------------
 # considered abstracting all this out into a complex rational type, but it was
 # a lot of work and i'm never going to use any of it again.
+
+def test_complex_multiplication(pyA, pyAj, pyB, pyBj):#{{{
+    cdef mpq_t a, aj, b, bj, n, nj
+    mpq_inits(a, aj, b, bj, n, nj, NULL)
+
+    from_fraction(a, pyA)
+    from_fraction(aj, pyAj)
+    from_fraction(b, pyB)
+    from_fraction(bj, pyBj)
+
+    traditional = complex(pyA, pyAj) * complex(pyB, pyBj)
+
+    mpq_mul_complex_a(n, nj, a, aj, b, bj)
+    mpq_mul_complex_b(a, aj, a, aj, b, bj)
+
+    A = from_mpq(n) + from_mpq(nj) * 1j
+    B = from_mpq(a) + from_mpq(aj) * 1j
+
+    if not (A == B == traditional):
+        print(traditional, A, B)#}}}
 
 cdef void mpq_mul_complex(mpq_t realOut, mpq_t imagOut,# {{{
         mpq_t realA, mpq_t imagA, mpq_t realB, mpq_t imagB):

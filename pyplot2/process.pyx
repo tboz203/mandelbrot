@@ -1,11 +1,11 @@
 # distutils: language = c++
 # cython: profile=True
 
-from libcpp.vector cimport vector
-from libcpp.string cimport string
-
 from matplotlib.colors import hsv_to_rgb
 import numpy as np
+
+from libcpp.vector cimport vector
+from libcpp.string cimport string
 
 def process(ranges, gran, maxiter, scale):
     x0, y0, xf, yf = ranges
@@ -20,11 +20,14 @@ def process(ranges, gran, maxiter, scale):
 
 
 cdef calculate(x_range, y_range, int maxiter, int scale):
-    data = np.zeros((len(x_range)+1, len(y_range)+1, 3), dtype=float)
+    data = np.zeros((len(x_range), len(y_range), 3), dtype=float)
 
     for i, y in enumerate(y_range):
-        for j, x in enumerate(x_range):
-            data[i, j] = to_hsv(iterations_to_escape(x, y, maxiter), scale)
+        try:
+            for j, x in enumerate(x_range):
+                data[i, j] = to_hsv(iterations_to_escape(x, y, maxiter), scale)
+        except IndexError:
+            pass
 
     return hsv_to_rgb(data)
 

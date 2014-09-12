@@ -4,6 +4,8 @@ import process
 import cProfile, pstats
 import sys
 
+exit()
+
 if not 'profile' in sys.argv:
 
     print('beginning `process`')
