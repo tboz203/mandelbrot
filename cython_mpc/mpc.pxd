@@ -129,3 +129,6 @@ cdef extern from "mpc.h":
 
     int mpc_inp_str    (mpc_ptr, FILE *, size_t *, int, mpc_rnd_t)
     size_t mpc_out_str (FILE *, int, size_t, mpc_srcptr, mpc_rnd_t)
+
+    mpfr_ptr mpc_realref    (mpc_ptr)
+    mpfr_ptr mpc_imagref    (mpc_ptr)
