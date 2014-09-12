@@ -7,7 +7,7 @@ import sys
 if 'run' in sys.argv:
 
     print('beginning `process`')
-    cProfile.run('process.process((-2, -2, 2, 2), 1000, 1000, 200)', 'Profile.prof')
+    cProfile.run('process.process((-2, -2, 2, 2), 250, 1000, 200)', 'Profile.prof')
     print('finished `process`')
 
 if 'profile' in sys.argv:
