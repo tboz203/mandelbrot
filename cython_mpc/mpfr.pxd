@@ -5,7 +5,6 @@ cdef extern from "mpfr.h":
     ctypedef struct __mpfr_struct:
         pass
 
-    #ctypedef __mpfr_struct mpfr_t[1]
     ctypedef __mpfr_struct* mpfr_t
     ctypedef mpfr_t mpfr_ptr
     ctypedef mpfr_t mpfr_srcptr

@@ -6,27 +6,30 @@ cdef extern from "mpc.h":
     ctypedef struct __mpc_struct:
         pass
 
-    int MPC_RNDNN
-    int MPC_RNDNU
-    int MPC_RNDND
-    int MPC_RNDNZ
+    ctypedef int mpc_rnd_t
 
-    int MPC_RNDUN
-    int MPC_RNDUU
-    int MPC_RNDUD
-    int MPC_RNDUZ
+    mpc_rnd_t MPC_RNDNN
+    mpc_rnd_t MPC_RNDNU
+    mpc_rnd_t MPC_RNDND
+    mpc_rnd_t MPC_RNDNZ
 
-    int MPC_RNDDN
-    int MPC_RNDDU
-    int MPC_RNDDD
-    int MPC_RNDDZ
+    mpc_rnd_t MPC_RNDUN
+    mpc_rnd_t MPC_RNDUU
+    mpc_rnd_t MPC_RNDUD
+    mpc_rnd_t MPC_RNDUZ
 
-    int MPC_RNDZN
-    int MPC_RNDZU
-    int MPC_RNDZD
-    int MPC_RNDZZ
+    mpc_rnd_t MPC_RNDDN
+    mpc_rnd_t MPC_RNDDU
+    mpc_rnd_t MPC_RNDDD
+    mpc_rnd_t MPC_RNDDZ
 
-    ctypedef __mpc_struct mpc_t[1]
+    mpc_rnd_t MPC_RNDZN
+    mpc_rnd_t MPC_RNDZU
+    mpc_rnd_t MPC_RNDZD
+    mpc_rnd_t MPC_RNDZZ
+
+    # ctypedef __mpc_struct mpc_t[1]
+    ctypedef __mpc_struct *mpc_t
     ctypedef __mpc_struct *mpc_ptr
     ctypedef const __mpc_struct *mpc_srcptr
 

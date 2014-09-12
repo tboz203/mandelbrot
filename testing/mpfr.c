@@ -3,7 +3,6 @@
 
 void main () {
     int i;
-    mpfr_exp_t e;
     mpfr_t a, b;
 
     mpfr_init2(a, 64);
