@@ -13,6 +13,8 @@ def process(ranges, gran, maxiter, scale):
     xstep = (xf - x0) / (<double>gran)
     ystep = (yf - y0) / (<double>gran)
 
+    step = min(xstep, ystep)
+
     x_range = np.arange(x0, xf, xstep)
     y_range = np.arange(y0, yf, ystep)
 
@@ -21,15 +23,18 @@ def process(ranges, gran, maxiter, scale):
 
 cdef calculate(x_range, y_range, int maxiter, int scale):
     data = np.zeros((len(x_range), len(y_range), 3), dtype=float)
+    # data = np.zeros((len(x_range), len(y_range)), dtype=float)
 
     for i, y in enumerate(y_range):
-        try:
-            for j, x in enumerate(x_range):
+        for j, x in enumerate(x_range):
+            try:
                 data[i, j] = to_hsv(iterations_to_escape(x, y, maxiter), scale)
-        except IndexError:
-            pass
+                # data[i, j] = iterations_to_escape(x, y, maxiter)
+            except IndexError:
+                pass
 
     return hsv_to_rgb(data)
+    # return data
 
 
 # the test function
@@ -51,6 +56,7 @@ cdef int iterations_to_escape(double x, double y, int maxiter):
         # then we *know* it's not in the set.
         if i >= maxiter:
             return -1
+            # break
 
     return i
 

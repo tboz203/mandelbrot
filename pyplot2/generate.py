@@ -43,15 +43,11 @@ def getargs():
     parser.add_argument('-r', '--ranges', type=float, nargs=4,
             default=[-2.0, -2.0, 2.0, 2.0],
             help='what section of the set to calculate.')
-    parser.add_argument('-o', '--outfile', default='mandelbrot.png',
-            help='what to call the resulting PNG image file.');
-    parser.add_argument('-e', '--errfile', default=None,
-            help='where to log any errors that result.')
-    parser.add_argument('-m', '--maxiter', default=70, type=int,
+    parser.add_argument('-m', '--maxiter', default=1000, type=int,
             help='the number of iterations to run per point.')
     parser.add_argument('-g', '--granularity', default=500, type=int,
             help='the number of points to calculate per axis.')
-    parser.add_argument('-s', '--scale', default=25, type=int,
+    parser.add_argument('-s', '--scale', default=200, type=int,
             help='a scaling value by which to loop colors')
     return parser.parse_args()
 

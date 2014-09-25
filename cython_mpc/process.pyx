@@ -1,9 +1,7 @@
 # {{{
 # distutils: language = c++
 # vim: fdm=marker
-'''
 # cython: profile=True
-'''
 
 from __future__ import print_function
 
@@ -35,17 +33,8 @@ def process(ranges, gran, maxiter, scale, size): # {{{
     xcount = int((xf - x0) / step)
     ycount = int((yf - y0) / step)
 
-    data = <long*>malloc(sizeof(long)*xcount*ycount)
-
-    for i in range(xcount):
-        for j in range(ycount):
-            iterations_to_escape(data, x_range, y_range, i, j, (i*ycount)+j,
-                    maxiter, size)
-
     output = np.zeros((ycount, xcount, 3))
-    for x in range(xcount):
-        for y in range(ycount):
-            output[y, x] = to_hsv(data[x*ycount + y], scale)
+    calculate(output, x_range, y_range, xcount, ycount, maxiter, size, scale)
 
     return hsv_to_rgb(output)
 
@@ -63,58 +52,53 @@ cdef mpfr_t* granulated_range(start, stop, step, size): # {{{
     return out
 # }}}
 
-cdef void iterations_to_escape(long *data, mpfr_t *x_range, # {{{
-        mpfr_t *y_range, int m, int n, int q, long maxiter, int size):
+cdef void calculate(output, mpfr_t *x_range, mpfr_t *y_range, # {{{
+        int xcount, int ycount, long maxiter, int size, int scale):
 
-    cdef long i = 0
+    cdef long n
+    cdef int val
     cdef mpc_t z, c
+    cdef mpfr_t abs_squared, real_squared, imag_squared
 
     mpc_init2(z, size)
     mpc_init2(c, size)
+    mpfr_inits2(size, abs_squared, real_squared, imag_squared, NULL)
 
-    mpc_set_si_si(z, 0, 0, MPC_RNDDD)
-    mpc_set_fr_fr(c, x_range[m], y_range[n], MPC_RNDDD)
+    for i in range(xcount):
+        for j in range(ycount):
+            n = 0
+            mpc_set_si_si(z, 0, 0, MPC_RNDDD)
+            mpc_set_fr_fr(c, x_range[i], y_range[j], MPC_RNDDD)
 
-    while abs_lt_2(z, size):
-        mpc_mul(z, z, z, MPC_RNDDD)
-        mpc_add(z, z, c, MPC_RNDDD)
+            while True:
+                # is a*a + b*b > c*c ?
+                mpfr_mul(real_squared, mpc_realref(z), mpc_realref(z), MPFR_RNDD)
+                mpfr_mul(imag_squared, mpc_imagref(z), mpc_imagref(z), MPFR_RNDD)
+                mpfr_add(abs_squared, real_squared, imag_squared, MPFR_RNDD)
+                if (mpfr_cmp_si(abs_squared, 4) > 0):
+                    break
 
-        i += 1
+                # z = z*z + c
+                mpc_mul(z, z, z, MPC_RNDDD)
+                mpc_add(z, z, c, MPC_RNDDD)
 
-        if i >= maxiter:
-            i = -1
-            break
+                n += 1
+
+                if n >= maxiter:
+                    n = -1
+                    break
+
+            output[j, i] = to_hsv(n, scale)
 
     mpc_clear(z)
     mpc_clear(c)
-
-    data[q] = i
-# }}}
-
-cdef bint abs_lt_2(mpc_ptr n, int size): # {{{
-    # cdef mpfr_t absolute
-    # cdef int retval
-    # mpfr_init2(absolute, size)
-    # mpc_abs(absolute, n, MPFR_RNDD)
-    # retval = (mpfr_cmp_si(absolute, 2) < 0)
-    # mpfr_clear(absolute)
-    # return retval
-
-    cdef mpfr_t abs_squared, real_squared, imag_squared
-    cdef int retval
-    mpfr_inits2(size, abs_squared, real_squared, imag_squared, NULL)
-    mpfr_mul(real_squared, mpc_realref(n), mpc_realref(n), MPFR_RNDD)
-    mpfr_mul(imag_squared, mpc_imagref(n), mpc_imagref(n), MPFR_RNDD)
-    mpfr_add(abs_squared, real_squared, imag_squared, MPFR_RNDD)
-    retval = (mpfr_cmp_si(abs_squared, 2) < 0)
     mpfr_clears(abs_squared, real_squared, imag_squared, NULL)
-    return retval
 # }}}
 
 cdef void init_set_from_decimal(mpfr_t out, dec, int size): # {{{
     mpfr_init2(out, size)
     decstr = str(dec)
-    mpfr_set_str(out, decstr, 16, MPFR_RNDD)
+    mpfr_set_str(out, decstr, 10, MPFR_RNDD)
 # }}}
 
 # cdef from_mpfr(mpfr_t n, fmtstr): # {{{

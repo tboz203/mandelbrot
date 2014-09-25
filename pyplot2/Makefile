@@ -1,8 +1,8 @@
 
 process.so: process.pyx
 	python setup.py build_ext --inplace
-	@rm -rf *.{c,cpp} build
+	@rm -rf process.cpp build
 
 clean:
-	@rm -rf *.{c,cpp,so} build
+	@rm -rf *.cpp *.c *.so build
 

@@ -33,6 +33,9 @@ cdef extern from "mpc.h":
     ctypedef __mpc_struct *mpc_ptr
     ctypedef const __mpc_struct *mpc_srcptr
 
+    int MPC_INEX_RE (int)
+    int MPC_INEX_IM (int)
+
     int  mpc_add       (mpc_ptr, mpc_srcptr, mpc_srcptr, mpc_rnd_t)
     int  mpc_add_fr    (mpc_ptr, mpc_srcptr, mpfr_srcptr, mpc_rnd_t)
     int  mpc_add_si    (mpc_ptr, mpc_srcptr, long int, mpc_rnd_t)

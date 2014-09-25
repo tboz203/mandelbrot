@@ -83,18 +83,21 @@ def getargs():
 def process(x_range, y_range, maxiter, scale):
     x_range = list(x_range)
     y_range = list(y_range)
-    data = np.zeros((len(x_range), len(y_range), 3), dtype=float)
+    # data = np.zeros((len(x_range), len(y_range), 3), dtype=float)
+    data = np.zeros((len(x_range), len(y_range)), dtype=float)
 
-    to_hsv = get_HSV_conversion_func(scale)
+    # to_hsv = get_HSV_conversion_func(scale)
 
     for i, y in enumerate(y_range):
         try:
             for j, x in enumerate(x_range):
-                data[i, j] = to_hsv(iterations_to_escape(x, y, maxiter))
+                # data[i, j] = to_hsv(iterations_to_escape(x, y, maxiter))
+                data[i, j] = iterations_to_escape(x, y, maxiter)
         except IndexError:
             pass
 
-    return hsv_to_rgb(data)
+    # return hsv_to_rgb(data)
+    return data
 
 
 # return values between start and stop at the specified granularity
@@ -130,7 +133,8 @@ def iterations_to_escape(x, y, maxiter):
         # point *isn't* in the set. if the magnitude of z ever goes above 2,
         # then we *know* it's not in the set.
         if i >= maxiter:
-            return None
+            # return None
+            break
 
     return i
 
